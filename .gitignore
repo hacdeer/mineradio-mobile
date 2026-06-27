@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.cookie
+.qq-cookie
+*.log
+.DS_Store
