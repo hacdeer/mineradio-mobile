@@ -1,0 +1,12 @@
+{
+  "outputDirectory": "www",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index" }
+  ],
+  "functions": {
+    "api/index.js": {
+      "memory": 512,
+      "maxDuration": 10
+    }
+  }
+}
