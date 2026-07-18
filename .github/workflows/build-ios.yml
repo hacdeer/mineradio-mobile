@@ -1,7 +1,7 @@
 name: Build Unsigned iOS IPA
 
 on:
-  workflow_dispatch: 
+  workflow_dispatch:
 
 jobs:
   build:
@@ -51,4 +51,3 @@ jobs:
         with:
           name: mineradio-unsigned-ipa
           path: mineradio-unsigned.ipa
-
