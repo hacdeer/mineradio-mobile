@@ -1,0 +1,53 @@
+name: Build Unsigned iOS IPA
+
+on:
+  workflow_dispatch: # 允许你在 GitHub 页面上点击按钮手动触发构建
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-with: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Web Frontend
+        run: npm run build
+
+      - name: Sync Capacitor iOS
+        run: npx cap sync ios
+
+      - name: Build Unsigned IPA
+        run: |
+          cd ios/App
+          # 使用 xcodebuild 命令行工具编译项目，并指定不进行代码签名
+          xcodebuild -workspace App.xcworkspace \
+                     -scheme App \
+                     -configuration Release \
+                     -sdk iphoneos \
+                     CODE_SIGNING_ALLOWED=NO \
+                     CODE_SIGNING_REQUIRED=NO \
+                     CODE_SIGN_IDENTITY="" \
+                     PROVISIONING_PROFILE_REQUIRED=NO \
+                     clean build
+          
+          # 创建 Payload 文件夹并打包成 .ipa
+          mkdir -p build/Payload
+          cp -r build/Release-iphoneos/App.app build/Payload/
+          cd build
+          zip -r ../../../mineradio-unsigned.ipa Payload
+
+      - name: Upload Unsigned IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: mineradio-unsigned-ipa
+          path: mineradio-unsigned.ipa
