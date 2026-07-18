@@ -14,11 +14,23 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22 # 1. 升级到符合 Vite 要求的 Node 22
           cache: 'npm'
 
       - name: Install dependencies
         run: npm install
+
+      - name: Fix HTML module attribute
+        run: |
+          # 2. 自动修复 index.html 缺少的 type="module" 属性
+          node -e "
+          const fs = require('fs');
+          let html = fs.readFileSync('public/index.html', 'utf8');
+          html = html.replace(/src=\"vendor\/three\.r128\.min\.js\"/g, 'src=\"vendor/three.r128.min.js\" type=\"module\"');
+          html = html.replace(/src=\"vendor\/music-tempo\.min\.js\"/g, 'src=\"vendor/music-tempo.min.js\" type=\"module\"');
+          html = html.replace(/src=\"vendor\/gsap\.min\.js\"/g, 'src=\"vendor/gsap.min.js\" type=\"module\"');
+          fs.writeFileSync('public/index.html', html, 'utf8');
+          "
 
       - name: Build Web Frontend
         run: npm run build
