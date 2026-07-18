@@ -14,7 +14,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22 # 1. 升级到符合 Vite 要求的 Node 22
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies
@@ -22,7 +22,6 @@ jobs:
 
       - name: Fix HTML module attribute
         run: |
-          # 2. 自动修复 index.html 缺少的 type="module" 属性
           node -e "
           const fs = require('fs');
           let html = fs.readFileSync('public/index.html', 'utf8');
@@ -35,8 +34,11 @@ jobs:
       - name: Build Web Frontend
         run: npm run build
 
-      - name: Sync Capacitor iOS
-        run: npx cap sync ios
+      - name: Initialize and Sync Capacitor iOS
+        run: |
+          # 自动初始化并添加缺少的 ios 原生目录
+          npx cap add ios
+          npx cap sync ios
 
       - name: Build Xcode Project (Unsigned)
         run: |
